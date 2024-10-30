@@ -9,11 +9,40 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
+    "fmt"
+ "github.com/rollout/rox-go/v5/server"
 	"github.com/gin-gonic/gin"
 )
 
+
+type Flags struct {
+        EnableTutorial server.RoxFlag
+}
+
+var flags = &Flags{
+        // Define the feature flags
+        EnableTutorial: server.NewRoxFlag(false),
+}
+
+var rox *server.Rox
+
+
+
 func main() {
+
+     options := server.NewRoxOptions(server.RoxOptionsBuilder{})
+
+        rox := server.NewRox()
+
+        // Register the flags container with the CloudBees platform
+        rox.RegisterWithEmptyNamespace(flags)
+
+        // Setup the feature management environment key
+        <-rox.Setup("781c4fb2-e537-47d9-6a10-7818cb92a644", options)
+
+        // Boolean flag example
+        fmt.Println("EnableTutorials value is " , flags.EnableTutorial.IsEnabled(nil))
+
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 
